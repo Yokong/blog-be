@@ -9,18 +9,16 @@ import (
 
 var db *xorm.Engine
 
-func init() {
+func InitMode() {
 	var err error
-	addr := "root:wuyukang.@/blog?charset=utf8&parseTime=True&loc=Local"
+	addr := "root:hejie0620.@(localhost:3306)/blog?charset=utf8&parseTime=True&loc=Local"
 	db, err = xorm.NewEngine("mysql", addr)
 	if err != nil {
 		panic(err)
 	}
 
 	db.ShowSQL(true)
-}
 
-func InitMode() {
 	syncTable(new(Post))
 	syncTable(new(Tag))
 	syncTable(new(PostTag))

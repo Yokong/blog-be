@@ -1,6 +1,7 @@
 package main
 
 import (
+	"blog-be/src/model"
 	"blog-be/src/router"
 	"log"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 )
 
 func main() {
+	model.InitMode()
 	r := router.InitRouter()
 
 	s := http.Server{
