@@ -1,15 +1,23 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"blog-be/src/router"
 	"log"
 	"net/http"
+	"time"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-	log.Fatal(r.Run(":9090"))
+	r := router.InitRouter()
+
+	s := http.Server{
+		Addr:              ":8989",
+		Handler:           r,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		ReadHeaderTimeout: 10 * time.Second,
+		IdleTimeout:       15 * time.Second,
+	}
+
+	log.Fatal(s.ListenAndServe())
 }
