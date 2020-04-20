@@ -1,6 +1,7 @@
 package model
 
 import (
+	"blog-be/src/config"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -11,8 +12,7 @@ var db *xorm.Engine
 
 func InitMode() {
 	var err error
-	addr := "root:password@(localhost:3306)/blog?charset=utf8&parseTime=True&loc=Local"
-	db, err = xorm.NewEngine("mysql", addr)
+	db, err = xorm.NewEngine("mysql", config.DbAddr)
 	if err != nil {
 		panic(err)
 	}

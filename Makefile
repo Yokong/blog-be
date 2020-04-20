@@ -3,7 +3,7 @@
 all: build docker clean
 
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o blog-be
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags=prod -o blog-be
 	@echo "------ build go success ------"
 
 docker:
