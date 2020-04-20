@@ -11,7 +11,7 @@ var db *xorm.Engine
 
 func InitMode() {
 	var err error
-	addr := "root:hejie0620.@(localhost:3306)/blog?charset=utf8&parseTime=True&loc=Local"
+	addr := "root:password@(localhost:3306)/blog?charset=utf8&parseTime=True&loc=Local"
 	db, err = xorm.NewEngine("mysql", addr)
 	if err != nil {
 		panic(err)

@@ -1,12 +1,13 @@
 package model
 
 type Post struct {
-	Id         int    `xorm:"pk autoincr"`
-	Title      string `xorm:"varchar(20)"`
-	Content    []byte
-	CoverUrl   string `xorm:"varchar(120)"`
-	CreateTime int    `xorm:"created"`
-	UpdateTime int    `xorm:"updated"`
+	Id         int    `xorm:"pk autoincr" json:"id"`
+	Title      string `xorm:"varchar(20)" json:"title"`
+	Content    []byte `json:"content"`
+	Desc       string `xorm:"varchar(1024)" json:"desc"`
+	CoverUrl   string `xorm:"varchar(120)" json:"coverUrl"`
+	CreateTime int    `xorm:"created" json:"createTime"`
+	UpdateTime int    `xorm:"updated" json:"updateTime"`
 }
 
 func (p *Post) Set() (int64, error) {
