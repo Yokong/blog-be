@@ -21,6 +21,6 @@ func GetImgReader(url string) (*ImgInfo, error) {
 	return &ImgInfo{
 		Data: data,
 		Len:  int64(len(data)),
-		Name: fmt.Sprintf("%d%d%d%d", now.Year(), now.Month(), now.Day(), now.Unix()),
+		Name: fmt.Sprintf("%d%d%d%d.png", now.Year(), now.Month(), now.Day(), now.Unix()),
 	}, err
 }

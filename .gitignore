@@ -1,2 +1,4 @@
 .idea/
 src/config/prod.go
+src/config/dev.go
+go.sum

@@ -4,16 +4,15 @@ import (
 	"blog-be/src/config"
 	"bytes"
 	"context"
-	"fmt"
 
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
 )
 
-func UploadImg(url string) error {
+func UploadImg(url string) (string, error) {
 	imgInfo, err := GetImgReader(url)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	putPolicy := storage.PutPolicy{
@@ -38,6 +37,5 @@ func UploadImg(url string) error {
 	}
 
 	err = uploader.Put(context.Background(), &ret, upToken, imgInfo.Name, bytes.NewReader(imgInfo.Data), imgInfo.Len, &putExtra)
-	fmt.Println(ret)
-	return err
+	return config.QiNiuDomain + ret.Key, err
 }

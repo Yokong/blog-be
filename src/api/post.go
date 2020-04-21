@@ -2,7 +2,8 @@ package api
 
 import (
 	"blog-be/src/model"
-	rsp "blog-be/src/rsp"
+	"blog-be/src/rsp"
+	"blog-be/src/util"
 	"fmt"
 	"net/http"
 
@@ -21,6 +22,15 @@ func SetPost(c *gin.Context) {
 	if p != nil {
 		rsp.Failed(c, -1002, "文章已存在")
 		return
+	}
+
+	if post.CoverUrl != "" {
+		imgUrl, err := util.UploadImg(post.CoverUrl)
+		if err != nil {
+			rsp.Failed(c, -1003, "上传CoverUrl失败")
+			return
+		}
+		post.CoverUrl = imgUrl
 	}
 
 	_, err = post.Set()
