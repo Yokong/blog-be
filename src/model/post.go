@@ -2,7 +2,7 @@ package model
 
 type Post struct {
 	Id         int    `xorm:"pk autoincr" json:"id"`
-	Title      string `xorm:"varchar(20)" json:"title"`
+	Title      string `xorm:"varchar(20)" json:"title" binding:"required"`
 	Content    []byte `json:"content"`
 	Desc       string `xorm:"varchar(1024)" json:"desc"`
 	CoverUrl   string `xorm:"varchar(120)" json:"coverUrl"`
@@ -18,6 +18,17 @@ func (p *Post) Set() (int64, error) {
 func (p *Post) Get() (bool, error) {
 	res, err := db.Get(p)
 	return res, err
+}
+
+func GetPostWithTitle(title string) *Post {
+	p := Post{
+		Title: title,
+	}
+	ok, err := db.Get(&p)
+	if !ok || err != nil {
+		return nil
+	}
+	return &p
 }
 
 func GetPostDescList() ([]Post, error) {

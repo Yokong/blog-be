@@ -1,6 +1,7 @@
 package main
 
 import (
+	"blog-be/src/config"
 	"blog-be/src/model"
 	"blog-be/src/router"
 	"log"
@@ -13,7 +14,7 @@ func main() {
 	r := router.InitRouter()
 
 	s := http.Server{
-		Addr:              ":8989",
+		Addr:              config.ServerAddr,
 		Handler:           r,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      10 * time.Second,
