@@ -10,9 +10,28 @@ type Post struct {
 	UpdateTime int    `xorm:"updated" json:"updateTime"`
 }
 
-func (p *Post) Set() (int64, error) {
-	n, err := db.Insert(p)
-	return n, err
+func (p *Post) SetWithTags(tags []int) error {
+	session := db.NewSession()
+	err := session.Begin()
+	if err != nil {
+		return err
+	}
+
+	// 保存文章
+	_, err = db.Insert(p)
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+
+	//// 保存标签
+	if err := SetTags(p.Id, tags); err != nil {
+		session.Rollback()
+		return err
+	}
+
+	err = session.Commit()
+	return err
 }
 
 func (p *Post) Get() (bool, error) {

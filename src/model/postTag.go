@@ -17,3 +17,17 @@ func (p *PostTag) Get() (bool, error) {
 	res, err := db.Get(p)
 	return res, err
 }
+
+func SetTags(postId int, tags []int) error {
+	for _, t := range tags {
+		p := PostTag{
+			PostId: uint(postId),
+			TagId:  uint(t),
+		}
+		_, err := db.Insert(&p)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

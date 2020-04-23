@@ -4,16 +4,17 @@ import (
 	"blog-be/src/model"
 	"blog-be/src/rsp"
 	"blog-be/src/util"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
 
 type SetPostParam struct {
-	Title    string   `json:"title"`
-	Content  string   `json:"content"`
-	Desc     string   `json:"desc"`
-	CoverUrl string   `json:"coverUrl"`
-	Tags     []string `json:"tags"`
+	Title    string `json:"title"`
+	Content  string `json:"content"`
+	Desc     string `json:"desc"`
+	CoverUrl string `json:"coverUrl"`
+	Tags     []int  `json:"tags"`
 }
 
 func SetPost(c *gin.Context) {
@@ -33,14 +34,14 @@ func SetPost(c *gin.Context) {
 	if postParam.CoverUrl != "" {
 		imgUrl, err := util.UploadImg(postParam.CoverUrl)
 		if err != nil {
-			rsp.Failed(c, -1003, "上传CoverUrl失败")
+			rsp.Failed(c, -1003, fmt.Sprintf("上传CoverUrl失败: %s", err.Error()))
 			return
 		}
 		postParam.CoverUrl = imgUrl
 	}
 
 	if err := savePost(&postParam); err != nil {
-		rsp.Failed(c, -1002, "上传文章失败")
+		rsp.Failed(c, -1002, fmt.Sprintf("上传文章失败: %s", err.Error()))
 		return
 	}
 
@@ -54,7 +55,7 @@ func savePost(param *SetPostParam) error {
 		Desc:     param.Desc,
 		CoverUrl: param.CoverUrl,
 	}
-	_, err := p.Set()
+	err := p.SetWithTags(param.Tags)
 	return err
 }
 
