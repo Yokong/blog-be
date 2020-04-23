@@ -16,6 +16,10 @@ type ImgInfo struct {
 func GetImgReader(url string) (*ImgInfo, error) {
 	now := time.Now()
 	rsp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
 	defer rsp.Body.Close()
 	data, err := ioutil.ReadAll(rsp.Body)
 	return &ImgInfo{

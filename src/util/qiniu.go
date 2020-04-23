@@ -4,12 +4,17 @@ import (
 	"blog-be/src/config"
 	"bytes"
 	"context"
+	"strings"
 
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
 )
 
 func UploadImg(url string) (string, error) {
+	if strings.Contains(url, config.QiNiuDomain) {
+		return url, nil
+	}
+
 	imgInfo, err := GetImgReader(url)
 	if err != nil {
 		return "", err
