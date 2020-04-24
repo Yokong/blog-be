@@ -52,6 +52,6 @@ func GetPostWithTitle(title string) *Post {
 
 func GetPostDescList() ([]Post, error) {
 	var postDescList []Post
-	err := db.Cols("id", "title", "cover_url", "create_time", "update_time").OrderBy("create_time").Find(&postDescList)
+	err := db.Cols("id", "title", "cover_url", "desc", "create_time", "update_time").OrderBy("create_time").Find(&postDescList)
 	return postDescList, err
 }

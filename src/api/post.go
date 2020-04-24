@@ -17,6 +17,7 @@ type SetPostParam struct {
 	Tags     []int  `json:"tags"`
 }
 
+// SetPost 设置文章
 func SetPost(c *gin.Context) {
 	var postParam SetPostParam
 	if err := c.ShouldBind(&postParam); err != nil {
@@ -46,6 +47,40 @@ func SetPost(c *gin.Context) {
 	}
 
 	rsp.Success(c, nil)
+}
+
+type GetPostParam struct {
+	Id int `json:"id"`
+}
+
+type GetPostRsp struct {
+	Title      string `json:"title"`
+	Content    string `json:"content"`
+	CreateTime int    `json:"create_time"`
+}
+
+// GetPost 获取文章
+func GetPost(c *gin.Context) {
+	var param GetPostParam
+	if err := c.ShouldBind(&param); err != nil {
+		rsp.Failed(c, -1000, err.Error())
+		return
+	}
+
+	p := model.Post{
+		Id: param.Id,
+	}
+	ret, err := p.Get()
+	if err != nil || !ret {
+		rsp.Failed(c, -1001, "文章找不到")
+		return
+	}
+
+	rsp.Success(c, GetPostRsp{
+		Title:      p.Title,
+		Content:    string(p.Content),
+		CreateTime: p.CreateTime,
+	})
 }
 
 func savePost(param *SetPostParam) error {

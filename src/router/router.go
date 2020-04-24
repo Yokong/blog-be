@@ -16,6 +16,7 @@ func InitRouter() *gin.Engine {
 	{
 		postGroup.GET("/list", api.GetPostDescList)
 		postGroup.POST("/create", api.SetPost)
+		postGroup.POST("/get", api.GetPost)
 	}
 
 	return r
