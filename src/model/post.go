@@ -39,6 +39,11 @@ func (p *Post) Get() (bool, error) {
 	return res, err
 }
 
+func (p *Post) UpdateById(id int) error {
+	_, err := db.ID(id).Update(p)
+	return err
+}
+
 func GetPostWithTitle(title string) *Post {
 	p := Post{
 		Title: title,

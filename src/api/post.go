@@ -49,6 +49,38 @@ func SetPost(c *gin.Context) {
 	rsp.Success(c, nil)
 }
 
+func savePost(param *SetPostParam) error {
+	p := model.Post{
+		Title:    param.Title,
+		Content:  []byte(param.Content),
+		Desc:     param.Desc,
+		CoverUrl: param.CoverUrl,
+	}
+	err := p.SetWithTags(param.Tags)
+	return err
+}
+
+type UpdatePostParam struct {
+	Id      int    `json:"id"`
+	Content string `json:"content"`
+}
+
+func UpdatePost(c *gin.Context) {
+	var param UpdatePostParam
+	if err := c.ShouldBind(&param); err != nil {
+		rsp.Failed(c, -1000, err.Error())
+		return
+	}
+
+	p := new(model.Post)
+	p.Content = []byte(param.Content)
+	if err := p.UpdateById(param.Id); err != nil {
+		rsp.Failed(c, -1001, err.Error())
+		return
+	}
+	rsp.Success(c, nil)
+}
+
 type GetPostParam struct {
 	Id int `json:"id"`
 }
@@ -81,17 +113,6 @@ func GetPost(c *gin.Context) {
 		Content:    string(p.Content),
 		CreateTime: p.CreateTime,
 	})
-}
-
-func savePost(param *SetPostParam) error {
-	p := model.Post{
-		Title:    param.Title,
-		Content:  []byte(param.Content),
-		Desc:     param.Desc,
-		CoverUrl: param.CoverUrl,
-	}
-	err := p.SetWithTags(param.Tags)
-	return err
 }
 
 // GetPostDescList 获取文章简介
