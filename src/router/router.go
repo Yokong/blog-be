@@ -1,7 +1,7 @@
 package router
 
 import (
-	"blog-be/src/api"
+	"blog-be/src/api/post"
 	"blog-be/src/config"
 	"fmt"
 	"net/http"
@@ -11,20 +11,22 @@ import (
 )
 
 func InitRouter() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
 	if config.Mode == "dev" {
 		r.Use(cors())
+		gin.SetMode(gin.DebugMode)
 	}
 
 	apiGroup := r.Group("/api")
 
 	postGroup := apiGroup.Group("/post")
 	{
-		postGroup.GET("/list", api.GetPostDescList)
-		postGroup.POST("/create", api.SetPost)
-		postGroup.POST("/get", api.GetPost)
-		postGroup.POST("/update", api.UpdatePost)
+		postGroup.GET("/list", post.GetPostDescList)
+		postGroup.POST("/create", post.SetPost)
+		postGroup.POST("/get", post.GetPost)
+		postGroup.POST("/update", post.UpdatePost)
 	}
 
 	return r
