@@ -43,13 +43,14 @@ func GetPost(c *gin.Context) {
 }
 
 type postDesc struct {
-	Id         int    `json:"id"`
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	Desc       string `json:"desc"`
-	CoverUrl   string `json:"coverUrl"`
-	Date       string `json:"date"`
-	UpdateTime string `json:"updateTime"`
+	Id         int      `json:"id"`
+	Title      string   `json:"title"`
+	Content    string   `json:"content"`
+	Desc       string   `json:"desc"`
+	CoverUrl   string   `json:"coverUrl"`
+	Tags       []string `json:"tags"`
+	Date       string   `json:"date"`
+	UpdateTime string   `json:"updateTime"`
 }
 
 // GetPostDescList 获取文章简介
@@ -59,12 +60,14 @@ func GetPostDescList(c *gin.Context) {
 		rsp.Failed(c, -1000, "获取文章简介失败")
 		return
 	}
+
+	postIdToTag := model.GetPostIdToTag()
 	rsp.Success(c, gin.H{
-		"posts": covertPostDesc(posts),
+		"posts": covertPostDesc(posts, postIdToTag),
 	})
 }
 
-func covertPostDesc(posts []model.Post) []postDesc {
+func covertPostDesc(posts []model.Post, postIdToTag map[int][]string) []postDesc {
 	var newPosts []postDesc
 	for _, v := range posts {
 		p := postDesc{
@@ -73,6 +76,7 @@ func covertPostDesc(posts []model.Post) []postDesc {
 			Content:    string(v.Content),
 			Desc:       v.Desc,
 			CoverUrl:   v.CoverUrl,
+			Tags:       postIdToTag[v.Id],
 			Date:       time.Unix(int64(v.CreateTime), 0).Format("2006-01-02 15:04"),
 			UpdateTime: time.Unix(int64(v.UpdateTime), 0).Format("2006-01-02 15:04"),
 		}

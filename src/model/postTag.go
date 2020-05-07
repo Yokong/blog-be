@@ -1,5 +1,11 @@
 package model
 
+import "strconv"
+
+const (
+	postIdTagNameSql = "select p.post_id, t.name from post_tag p join tag t on t.id = p.tag_id"
+)
+
 type PostTag struct {
 	Id         int `xorm:"pk autoincr"`
 	PostId     uint
@@ -30,4 +36,26 @@ func SetTags(postId int, tags []int) error {
 		}
 	}
 	return nil
+}
+
+func GetPostIdToTag() map[int][]string {
+	res, err := db.Query(postIdTagNameSql)
+	if err != nil {
+		return nil
+	}
+
+	postIdToTag := make(map[int][]string)
+	for _, v := range res {
+		postIdByte := v["post_id"]
+		postId, err := strconv.Atoi(string(postIdByte))
+		if err != nil {
+			continue
+		}
+
+		tags := postIdToTag[postId]
+		tags = append(tags, string(v["name"]))
+		postIdToTag[postId] = tags
+	}
+
+	return postIdToTag
 }
