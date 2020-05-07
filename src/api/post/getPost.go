@@ -3,6 +3,7 @@ package post
 import (
 	"blog-be/src/model"
 	"blog-be/src/rsp"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,6 +42,16 @@ func GetPost(c *gin.Context) {
 	})
 }
 
+type postDesc struct {
+	Id         int    `json:"id"`
+	Title      string `json:"title"`
+	Content    string `json:"content"`
+	Desc       string `json:"desc"`
+	CoverUrl   string `json:"coverUrl"`
+	Date       string `json:"date"`
+	UpdateTime string `json:"updateTime"`
+}
+
 // GetPostDescList 获取文章简介
 func GetPostDescList(c *gin.Context) {
 	posts, err := model.GetPostDescList()
@@ -49,6 +60,24 @@ func GetPostDescList(c *gin.Context) {
 		return
 	}
 	rsp.Success(c, gin.H{
-		"posts": posts,
+		"posts": covertPostDesc(posts),
 	})
+}
+
+func covertPostDesc(posts []model.Post) []postDesc {
+	var newPosts []postDesc
+	for _, v := range posts {
+		p := postDesc{
+			Id:         v.Id,
+			Title:      v.Title,
+			Content:    string(v.Content),
+			Desc:       v.Desc,
+			CoverUrl:   v.CoverUrl,
+			Date:       time.Unix(int64(v.CreateTime), 0).Format("2006-01-02 15:04"),
+			UpdateTime: time.Unix(int64(v.UpdateTime), 0).Format("2006-01-02 15:04"),
+		}
+		newPosts = append(newPosts, p)
+	}
+
+	return newPosts
 }
