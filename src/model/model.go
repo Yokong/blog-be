@@ -2,30 +2,26 @@ package model
 
 import (
 	"blog-be/src/config"
-	"fmt"
+	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	"xorm.io/xorm"
+	"github.com/jinzhu/gorm"
 )
 
-var db *xorm.Engine
+var db *gorm.DB
 
 func InitMode() {
 	var err error
-	db, err = xorm.NewEngine("mysql", config.DbAddr)
+	db, err = gorm.Open("mysql", config.DbAddr)
 	if err != nil {
 		panic(err)
 	}
 
-	db.ShowSQL(true)
+	db.LogMode(true)
+	db.SetLogger(log.New(os.Stdout, "\n\r", 0))
 
-	syncTable(new(Post))
-	syncTable(new(Tag))
-	syncTable(new(PostTag))
-}
-
-func syncTable(tb interface{}) {
-	if err := db.Sync2(tb); err != nil {
-		fmt.Println(err)
-	}
+	db.AutoMigrate(&Post{})
+	db.AutoMigrate(&Tag{})
+	db.AutoMigrate(&PostTag{})
 }

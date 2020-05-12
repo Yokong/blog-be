@@ -51,10 +51,10 @@ func SetPost(c *gin.Context) {
 
 func savePost(param *SetPostParam) error {
 	p := model.Post{
-		Title:    param.Title,
-		Content:  []byte(param.Content),
-		Desc:     param.Desc,
-		CoverUrl: param.CoverUrl,
+		Title:     param.Title,
+		Content:   []byte(param.Content),
+		Introduce: param.Desc,
+		CoverUrl:  param.CoverUrl,
 	}
 	err := p.SetWithTags(param.Tags)
 	return err

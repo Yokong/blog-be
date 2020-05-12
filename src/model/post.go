@@ -1,55 +1,61 @@
 package model
 
+import (
+	"fmt"
+
+	"github.com/jinzhu/gorm"
+)
+
 type Post struct {
-	Id         int    `xorm:"pk autoincr" json:"id"`
-	Title      string `xorm:"varchar(20)" json:"title" binding:"required"`
-	Content    []byte `json:"content"`
-	Desc       string `xorm:"varchar(1024)" json:"desc"`
-	CoverUrl   string `xorm:"varchar(120)" json:"coverUrl"`
-	CreateTime int    `xorm:"created" json:"createTime"`
-	UpdateTime int    `xorm:"updated" json:"updateTime"`
+	gorm.Model
+	Content   []byte `gorm:"type:blob"`
+	Title     string `gorm:"size:20"`
+	Introduce string `gorm:"size:1024"`
+	CoverUrl  string `gorm:"size:120"`
 }
 
 func (p *Post) SetWithTags(tags []int) error {
-	session := db.NewSession()
-	err := session.Begin()
-	if err != nil {
+	tx := db.Begin()
+	if err := tx.Error; err != nil {
 		return err
 	}
 
 	// 保存文章
-	_, err = db.Insert(p)
-	if err != nil {
-		session.Rollback()
+	if err := tx.Create(p).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	//// 保存标签
-	if err := SetTags(p.Id, tags); err != nil {
-		session.Rollback()
+	if err := SetTags(int(p.ID), tags); err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	err = session.Commit()
-	return err
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
 }
 
-func (p *Post) Get() (bool, error) {
-	res, err := db.Get(p)
-	return res, err
+func (p *Post) Get(id int) (bool, error) {
+	if err := db.Where("id = ?", id).Find(&p).Error; err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (p *Post) UpdateById(id int) error {
-	_, err := db.ID(id).Update(p)
+	p.ID = uint(id)
+	err := db.Model(&p).Updates(p).Error
 	return err
 }
 
 func GetPostWithTitle(title string) *Post {
-	p := Post{
-		Title: title,
-	}
-	ok, err := db.Get(&p)
-	if !ok || err != nil {
+	var p Post
+	if err := db.Where("title = ?", title).Find(&p).Error; err != nil {
+		fmt.Println(err)
 		return nil
 	}
 	return &p
@@ -57,6 +63,6 @@ func GetPostWithTitle(title string) *Post {
 
 func GetPostDescList() ([]Post, error) {
 	var postDescList []Post
-	err := db.Cols("id", "title", "cover_url", "desc", "create_time", "update_time").OrderBy("create_time").Find(&postDescList)
+	err := db.Select([]string{"id", "title", "cover_url", "introduce", "created_at", "updated_at"}).Order("created_at", true).Find(&postDescList).Error
 	return postDescList, err
 }

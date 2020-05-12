@@ -1,27 +1,31 @@
 package model
 
-import "strconv"
+import (
+	"fmt"
+
+	"github.com/jinzhu/gorm"
+)
 
 const (
-	postIdTagNameSql = "select p.post_id, t.name from post_tag p join tag t on t.id = p.tag_id"
+	postIdTagNameSql = "select p.post_id, t.name from post_tags p join tags t on t.id = p.tag_id"
 )
 
 type PostTag struct {
-	Id         int `xorm:"pk autoincr"`
-	PostId     uint
-	TagId      uint
-	CreateTime int `xorm:"created"`
-	UpdateTime int `xorm:"updated"`
+	gorm.Model
+	PostId uint
+	TagId  uint
 }
 
-func (p *PostTag) Set() (int64, error) {
-	n, err := db.Insert(&p)
-	return n, err
+func (p *PostTag) Set() error {
+	err := db.Create(&p).Error
+	return err
 }
 
 func (p *PostTag) Get() (bool, error) {
-	res, err := db.Get(p)
-	return res, err
+	if err := db.Find(&p).Error; err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func SetTags(postId int, tags []int) error {
@@ -30,8 +34,7 @@ func SetTags(postId int, tags []int) error {
 			PostId: uint(postId),
 			TagId:  uint(t),
 		}
-		_, err := db.Insert(&p)
-		if err != nil {
+		if err := db.Create(&p).Error; err != nil {
 			return err
 		}
 	}
@@ -39,21 +42,23 @@ func SetTags(postId int, tags []int) error {
 }
 
 func GetPostIdToTag() map[int][]string {
-	res, err := db.Query(postIdTagNameSql)
+	rows, err := db.Raw(postIdTagNameSql).Rows()
+	defer rows.Close()
 	if err != nil {
 		return nil
 	}
 
 	postIdToTag := make(map[int][]string)
-	for _, v := range res {
-		postIdByte := v["post_id"]
-		postId, err := strconv.Atoi(string(postIdByte))
-		if err != nil {
-			continue
+	for rows.Next() {
+		var postId int
+		var name string
+		if err := rows.Scan(&postId, &name); err != nil {
+			fmt.Println(err)
+			return nil
 		}
 
 		tags := postIdToTag[postId]
-		tags = append(tags, string(v["name"]))
+		tags = append(tags, name)
 		postIdToTag[postId] = tags
 	}
 

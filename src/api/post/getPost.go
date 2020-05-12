@@ -15,7 +15,7 @@ type GetPostParam struct {
 type GetPostRsp struct {
 	Title      string `json:"title"`
 	Content    string `json:"content"`
-	CreateTime int    `json:"create_time"`
+	CreateTime int64  `json:"createTime"`
 }
 
 // GetPost 获取文章
@@ -26,10 +26,8 @@ func GetPost(c *gin.Context) {
 		return
 	}
 
-	p := model.Post{
-		Id: param.Id,
-	}
-	ret, err := p.Get()
+	p := new(model.Post)
+	ret, err := p.Get(param.Id)
 	if err != nil || !ret {
 		rsp.Failed(c, -1001, "文章找不到")
 		return
@@ -38,7 +36,7 @@ func GetPost(c *gin.Context) {
 	rsp.Success(c, GetPostRsp{
 		Title:      p.Title,
 		Content:    string(p.Content),
-		CreateTime: p.CreateTime,
+		CreateTime: p.CreatedAt.Unix(),
 	})
 }
 
@@ -71,14 +69,14 @@ func covertPostDesc(posts []model.Post, postIdToTag map[int][]string) []postDesc
 	var newPosts []postDesc
 	for _, v := range posts {
 		p := postDesc{
-			Id:         v.Id,
+			Id:         int(v.ID),
 			Title:      v.Title,
 			Content:    string(v.Content),
-			Desc:       v.Desc,
+			Desc:       v.Introduce,
 			CoverUrl:   v.CoverUrl,
-			Tags:       postIdToTag[v.Id],
-			Date:       time.Unix(int64(v.CreateTime), 0).Format("2006-01-02 15:04"),
-			UpdateTime: time.Unix(int64(v.UpdateTime), 0).Format("2006-01-02 15:04"),
+			Tags:       postIdToTag[int(v.ID)],
+			Date:       time.Unix(v.CreatedAt.Unix(), 0).Format("2006-01-02 15:04"),
+			UpdateTime: time.Unix(v.UpdatedAt.Unix(), 0).Format("2006-01-02 15:04"),
 		}
 		newPosts = append(newPosts, p)
 	}
