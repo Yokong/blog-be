@@ -1,8 +1,8 @@
 package router
 
 import (
-	"blog-be/src/api/post"
-	"blog-be/src/config"
+	"blog-be/app/api/post"
+	"blog-be/app/config"
 	"fmt"
 	"net/http"
 	"strings"

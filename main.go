@@ -1,9 +1,9 @@
 package main
 
 import (
-	"blog-be/src/config"
-	"blog-be/src/model"
-	"blog-be/src/router"
+	"blog-be/app/config"
+	"blog-be/app/model"
+	"blog-be/app/router"
 	"log"
 	"net/http"
 	"time"

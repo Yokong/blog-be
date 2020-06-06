@@ -1,7 +1,7 @@
 package model
 
 import (
-	"blog-be/src/config"
+	"blog-be/app/config"
 	"log"
 	"os"
 

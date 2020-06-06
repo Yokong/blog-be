@@ -1,9 +1,9 @@
 package post
 
 import (
-	"blog-be/src/model"
-	"blog-be/src/rsp"
-	"blog-be/src/util"
+	"blog-be/app/model"
+	"blog-be/app/rsp"
+	"blog-be/app/util"
 	"fmt"
 
 	"github.com/gin-gonic/gin"

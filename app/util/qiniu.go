@@ -1,7 +1,7 @@
 package util
 
 import (
-	"blog-be/src/config"
+	"blog-be/app/config"
 	"bytes"
 	"context"
 	"strings"

@@ -1,8 +1,8 @@
 package post
 
 import (
-	"blog-be/src/model"
-	"blog-be/src/rsp"
+	"blog-be/app/model"
+	"blog-be/app/rsp"
 	"time"
 
 	"github.com/gin-gonic/gin"
