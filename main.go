@@ -10,11 +10,18 @@ import (
 )
 
 func main() {
-	model.InitMode()
+	if err := config.InitConfig(); err != nil {
+		panic(err)
+	}
+	if err := model.InitMode(); err != nil {
+		panic(err)
+	}
 	r := router.InitRouter()
 
+	c := config.GetConfig()
+
 	s := http.Server{
-		Addr:              config.ServerAddr,
+		Addr:              c.ServerAddr,
 		Handler:           r,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      10 * time.Second,

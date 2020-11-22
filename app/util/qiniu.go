@@ -11,7 +11,8 @@ import (
 )
 
 func UploadImg(url string) (string, error) {
-	if strings.Contains(url, config.QiNiuDomain) {
+	c := config.GetConfig()
+	if strings.Contains(url, c.QiNiu.Domain) {
 		return url, nil
 	}
 
@@ -21,10 +22,10 @@ func UploadImg(url string) (string, error) {
 	}
 
 	putPolicy := storage.PutPolicy{
-		Scope: config.QiNiuBucket,
+		Scope: c.QiNiu.Bucket,
 	}
 
-	mac := qbox.NewMac(config.QiNiuAK, config.QiNiuSK)
+	mac := qbox.NewMac(c.QiNiu.Ak, c.QiNiu.Sk)
 	upToken := putPolicy.UploadToken(mac)
 
 	cfg := storage.Config{
@@ -42,5 +43,5 @@ func UploadImg(url string) (string, error) {
 	}
 
 	err = uploader.Put(context.Background(), &ret, upToken, imgInfo.Name, bytes.NewReader(imgInfo.Data), imgInfo.Len, &putExtra)
-	return config.QiNiuDomain + ret.Key, err
+	return c.QiNiu.Domain + ret.Key, err
 }

@@ -11,11 +11,12 @@ import (
 
 var db *gorm.DB
 
-func InitMode() {
+func InitMode() error {
 	var err error
-	db, err = gorm.Open("mysql", config.DbAddr)
+	c := config.GetConfig()
+	db, err = gorm.Open("mysql", c.Db.Addr)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	db.LogMode(true)
@@ -24,4 +25,6 @@ func InitMode() {
 	db.AutoMigrate(&Post{})
 	db.AutoMigrate(&Tag{})
 	db.AutoMigrate(&PostTag{})
+
+	return nil
 }

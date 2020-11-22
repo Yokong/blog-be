@@ -14,7 +14,8 @@ func InitRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
-	if config.Mode == "dev" {
+	c := config.GetConfig()
+	if c.Mode == "dev" {
 		r.Use(cors())
 		gin.SetMode(gin.DebugMode)
 	}
