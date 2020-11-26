@@ -8,8 +8,8 @@ build:
 
 docker:
 	docker build -t blog-be .
-	docker tag blog-be yokooll/blog-be
-	docker push yokooll/blog-be
+	docker tag blog-be yokowu/blog-be
+	docker push yokowu/blog-be
 	@echo "------ docker push success ------"
 
 clean:
