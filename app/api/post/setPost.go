@@ -5,6 +5,7 @@ import (
 	"blog-be/app/rsp"
 	"blog-be/app/util"
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,12 @@ type SetPostParam struct {
 	Desc     string `json:"desc"`
 	CoverUrl string `json:"coverUrl"`
 	Tags     []int  `json:"tags"`
+}
+
+type ImgChan struct {
+	Code      int
+	Img       string
+	OriginImg string
 }
 
 // SetPost 设置文章
@@ -30,6 +37,10 @@ func SetPost(c *gin.Context) {
 		rsp.Failed(c, -1002, "文章已存在")
 		return
 	}
+
+	var ch chan string
+	go changeImgUrl(postParam.Content, ch)
+	postParam.Content = <-ch
 
 	// 将图片地址转换成七牛地址
 	if postParam.CoverUrl != "" {
@@ -47,6 +58,42 @@ func SetPost(c *gin.Context) {
 	}
 
 	rsp.Success(c, nil)
+}
+
+func changeImgUrl(content string, ret chan string) {
+	imgs := util.GetImgsByString(content)
+	var ch chan ImgChan
+	for _, img := range imgs {
+		go uploadImg(img, ch)
+	}
+
+	for v := range ch {
+		if v.Code != 0 {
+			continue
+		}
+		fmt.Printf("上传图片结果: %v", v)
+
+		content = strings.Replace(content, v.OriginImg, v.Img, len(content))
+	}
+
+	ret <- content
+}
+
+func uploadImg(img string, ch chan ImgChan) {
+	var ic ImgChan
+	var newImg string
+	var err error
+	if newImg, err = util.UploadImg(img); err != nil {
+		ic.Code = -1
+		ic.OriginImg = img
+		ch <- ic
+		return
+	}
+
+	ic.Code = 0
+	ic.OriginImg = img
+	ic.Img = newImg
+	ch <- ic
 }
 
 func savePost(param *SetPostParam) error {

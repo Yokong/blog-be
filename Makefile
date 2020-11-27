@@ -2,6 +2,8 @@
 
 all: build docker clean
 
+dev: build docker_dev clean
+
 build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags=prod -o blog-be
 	@echo "------ build go success ------"
@@ -10,6 +12,12 @@ docker:
 	docker build -t blog-be .
 	docker tag blog-be yokowu/blog-be
 	docker push yokowu/blog-be
+	@echo "------ docker push success ------"
+
+docker_dev:
+	docker build -t blog-be .
+	docker tag blog-be yokowu/blog-be:dev
+	docker push yokowu/blog-be:dev
 	@echo "------ docker push success ------"
 
 clean:

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -27,4 +28,16 @@ func GetImgReader(url string) (*ImgInfo, error) {
 		Len:  int64(len(data)),
 		Name: fmt.Sprintf("%d%d%d%d.png", now.Year(), now.Month(), now.Day(), now.Unix()),
 	}, err
+}
+
+func GetImgsByString(s string) []string {
+	reg := regexp.MustCompile(`\((http.*\.(png|jpg))\)`)
+	ret := reg.FindAllStringSubmatch(s, len(s))
+	l := make([]string, 0)
+	for _, v := range ret {
+		if len(v) > 1 {
+			l = append(l, v[1])
+		}
+	}
+	return l
 }
