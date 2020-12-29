@@ -1,7 +1,7 @@
 serverAddr: ":8080"
 mode: dev
 db:
-  addr: "root:password@(localhost:3306)/blog?charset=utf8mb4&parseTime=True"
+  addr: "root:blog0620.@(localhost:3306)/blog?charset=utf8mb4&parseTime=True"
 qiNiu:
   ak:
   sk:
