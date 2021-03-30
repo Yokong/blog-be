@@ -52,3 +52,21 @@ func coverPostList(posts []db.Post) []ListPostRsp {
 
 	return list
 }
+
+type ID struct {
+	Id int32 `uri:"id" binding:"required"`
+}
+
+func (s *Server) Get(c *gin.Context) {
+	var req ID
+	if err := c.ShouldBindUri(&req); err != nil {
+		rsp.Failed(c, -1000, err.Error())
+		return
+	}
+	post, err := s.store.GetPostWithID(context.Background(), req.Id)
+	if err != nil {
+		rsp.Failed(c, -1001, err.Error())
+		return
+	}
+	rsp.Success(c, post)
+}
