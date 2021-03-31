@@ -42,11 +42,10 @@ func coverPostList(posts []db.Post) []ListPostRsp {
 		list = append(list, ListPostRsp{
 			ID:          v.ID,
 			Title:       v.Title,
-			Content:     v.Content,
 			Introduce:   v.Introduce,
 			CoverUrl:    v.CoverUrl,
-			CreatedTime: v.CreatedAt.String(),
-			UpdatedTime: v.UpdatedAt.Time.String(),
+			CreatedTime: v.CreatedAt.Format("2006/01/02"),
+			UpdatedTime: v.UpdatedAt.Time.Format("2006/01/02"),
 		})
 	}
 
