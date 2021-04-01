@@ -3,19 +3,21 @@ package api
 import (
 	"blog-be/app/rsp"
 	"context"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/yokowu/blog-db/db"
 )
 
 type ListPostRsp struct {
-	ID          int32  `json:"id"`
-	Content     string `json:"content"`
-	Title       string `json:"title"`
-	Introduce   string `json:"introduce"`
-	CoverUrl    string `json:"coverUrl"`
-	CreatedTime string `json:"createdTime"`
-	UpdatedTime string `json:"updatedTime"`
+	ID          int32    `json:"id"`
+	Content     string   `json:"content"`
+	Title       string   `json:"title"`
+	Introduce   string   `json:"introduce"`
+	CoverUrl    string   `json:"coverUrl"`
+	Tags        []string `json:"tags"`
+	CreatedTime string   `json:"createdTime"`
+	UpdatedTime string   `json:"updatedTime"`
 }
 
 func (s *Server) ListPost(c *gin.Context) {
@@ -33,10 +35,30 @@ func (s *Server) ListPost(c *gin.Context) {
 		rsp.Failed(c, -1001, err.Error())
 		return
 	}
-	rsp.Success(c, coverPostList(posts))
+	rsp.Success(c, coverPostList(posts, s.fetchTagMap(posts)))
 }
 
-func coverPostList(posts []db.Post) []ListPostRsp {
+func (s *Server) fetchTagMap(posts []db.Post) map[int32][]string {
+	postIds := make([]string, 0)
+	for _, v := range posts {
+		i := strconv.Itoa(int(v.ID))
+		postIds = append(postIds, i)
+	}
+
+	tagNames, err := s.store.ListPostTagWithPostIDs(context.Background(), postIds)
+	if err != nil {
+		return nil
+	}
+
+	m := make(map[int32][]string)
+	for _, v := range tagNames {
+		m[v.PostID] = append(m[v.PostID], v.TagName)
+	}
+
+	return m
+}
+
+func coverPostList(posts []db.Post, tagMap map[int32][]string) []ListPostRsp {
 	var list []ListPostRsp
 	for _, v := range posts {
 		list = append(list, ListPostRsp{
@@ -44,6 +66,7 @@ func coverPostList(posts []db.Post) []ListPostRsp {
 			Title:       v.Title,
 			Introduce:   v.Introduce,
 			CoverUrl:    v.CoverUrl,
+			Tags:        tagMap[v.ID],
 			CreatedTime: v.CreatedAt.Format("2006/01/02"),
 			UpdatedTime: v.UpdatedAt.Time.Format("2006/01/02"),
 		})
